@@ -4,6 +4,7 @@ import 'package:flutter_state_notifier/flutter_state_notifier.dart';
 import 'package:flutter_testapp/graphql/api.dart';
 import 'package:flutter_testapp/state/my_state.dart';
 import 'package:flutter_testapp/test_notifier.dart';
+import 'package:flutter_testapp/until/validate.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:provider/src/provider.dart';
 
@@ -14,11 +15,10 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-final formKey = GlobalKey<FormState>();
-
 class _LoginPageState extends State<LoginPage> {
   late TextEditingController usernameController;
   late TextEditingController passwordController;
+  final formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -51,26 +51,29 @@ class _LoginPageState extends State<LoginPage> {
               body: SingleChildScrollView(
                 reverse: false,
                 child: SafeArea(
-                  child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 12),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 20),
-                        label(),
-                        nameInput(),
-                        SizedBox(height: 12),
-                        passInput(),
-                        SizedBox(height: 8),
-                        forgotText(),
-                        checkbox(),
-                        SizedBox(height: 12),
-                        queryView(context),
-                        SizedBox(height: 8),
-                        orText(),
-                        icon(),
-                        SizedBox(height: 70),
-                        signUpText()
-                      ],
+                  child: Form(
+                    key: formKey,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 12),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 20),
+                          label(),
+                          nameInput(),
+                          SizedBox(height: 12),
+                          passInput(),
+                          SizedBox(height: 8),
+                          forgotText(),
+                          checkbox(),
+                          SizedBox(height: 12),
+                          queryView(context),
+                          SizedBox(height: 8),
+                          orText(),
+                          icon(),
+                          SizedBox(height: 50),
+                          signUpText()
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -86,9 +89,9 @@ class _LoginPageState extends State<LoginPage> {
       controller: usernameController,
       text: "Enter your user name",
       icon: Icon(Icons.mail),
-      // validator: (val) {
-      //   return userNameValidate(val);
-      // },
+      validator: (val) {
+        return userNameValidate(val!);
+      },
     );
   }
 
@@ -101,8 +104,8 @@ class _LoginPageState extends State<LoginPage> {
           getUserByName,
         ),
         variables: <String, dynamic>{
-          "name": usernameController.text,
-          'rocket': passwordController.text,
+          "name": "",
+          'rocket': "",
         },
       ),
       builder: (QueryResult result,
@@ -125,20 +128,21 @@ class _LoginPageState extends State<LoginPage> {
             btnLogin(
                 text: "Login",
                 onPressed: () {
-                  print("object");
-                  final opts = FetchMoreOptions(
-                    variables: {
-                      'name': usernameController.text,
-                      'rocket': passwordController.text
-                    },
-                    updateQuery: (previousResultData, fetchMoreResultData) {
-                      return fetchMoreResultData;
-                    },
-                  );
+                  if (formKey.currentState!.validate()) {
+                    final opts = FetchMoreOptions(
+                      variables: {
+                        'name': usernameController.text,
+                        'rocket': passwordController.text
+                      },
+                      updateQuery: (previousResultData, fetchMoreResultData) {
+                        return fetchMoreResultData;
+                      },
+                    );
 
-                  fetchMore!(opts);
-                  FocusScope.of(context).unfocus();
-                  setState(() {});
+                    fetchMore!(opts);
+                    FocusScope.of(context).unfocus();
+                    setState(() {});
+                  }
                 }),
             context.read<TestNotifier>().notify != ""
                 ? Column(
@@ -149,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                       baseText(text: noti, color: Colors.black, sizeText: 24),
                     ],
                   )
-                : Container()
+                : Container(),
           ],
         );
       },
@@ -264,9 +268,9 @@ class _LoginPageState extends State<LoginPage> {
       controller: passwordController,
       text: "Enter your password",
       icon: Icon(Icons.vpn_key),
-      // validator: (val) {
-      //   return passwordValidate(val);
-      // },
+      validator: (val) {
+        return passwordValidate(val!);
+      },
     );
   }
 
@@ -320,7 +324,7 @@ class _LoginPageState extends State<LoginPage> {
     String? text,
     Icon? icon,
     bool isShowText = false,
-    // String Function(String)? validator,
+    String? Function(String?)? validator,
   }) {
     return Column(
       children: [
@@ -334,7 +338,7 @@ class _LoginPageState extends State<LoginPage> {
         TextFormField(
           controller: controller,
           obscureText: isShowText,
-          // validator: validator,
+          validator: validator,
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.0),

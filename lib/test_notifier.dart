@@ -9,7 +9,6 @@ class TestNotifier extends StateNotifier<MyState> with LocatorMixin {
 
   void addValue(QueryResult queryResult) {
     state = MyState().copyWith(result: queryResult);
-    print("abc");
     // print(state.result!.data!['users'].length.toString());
     if (isStart) {
       setNotification();
