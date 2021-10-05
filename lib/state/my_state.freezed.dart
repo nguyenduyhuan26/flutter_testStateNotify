@@ -16,9 +16,10 @@ final _privateConstructorUsedError = UnsupportedError(
 class _$MyStateTearOff {
   const _$MyStateTearOff();
 
-  _MyState call({QueryResult? result}) {
+  _MyState call({QueryResult? result, String? notify}) {
     return _MyState(
       result: result,
+      notify: notify,
     );
   }
 }
@@ -29,6 +30,7 @@ const $MyState = _$MyStateTearOff();
 /// @nodoc
 mixin _$MyState {
   QueryResult? get result => throw _privateConstructorUsedError;
+  String? get notify => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $MyStateCopyWith<MyState> get copyWith => throw _privateConstructorUsedError;
@@ -38,7 +40,7 @@ mixin _$MyState {
 abstract class $MyStateCopyWith<$Res> {
   factory $MyStateCopyWith(MyState value, $Res Function(MyState) then) =
       _$MyStateCopyWithImpl<$Res>;
-  $Res call({QueryResult? result});
+  $Res call({QueryResult? result, String? notify});
 }
 
 /// @nodoc
@@ -52,12 +54,17 @@ class _$MyStateCopyWithImpl<$Res> implements $MyStateCopyWith<$Res> {
   @override
   $Res call({
     Object? result = freezed,
+    Object? notify = freezed,
   }) {
     return _then(_value.copyWith(
       result: result == freezed
           ? _value.result
           : result // ignore: cast_nullable_to_non_nullable
               as QueryResult?,
+      notify: notify == freezed
+          ? _value.notify
+          : notify // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -67,7 +74,7 @@ abstract class _$MyStateCopyWith<$Res> implements $MyStateCopyWith<$Res> {
   factory _$MyStateCopyWith(_MyState value, $Res Function(_MyState) then) =
       __$MyStateCopyWithImpl<$Res>;
   @override
-  $Res call({QueryResult? result});
+  $Res call({QueryResult? result, String? notify});
 }
 
 /// @nodoc
@@ -82,12 +89,17 @@ class __$MyStateCopyWithImpl<$Res> extends _$MyStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? result = freezed,
+    Object? notify = freezed,
   }) {
     return _then(_MyState(
       result: result == freezed
           ? _value.result
           : result // ignore: cast_nullable_to_non_nullable
               as QueryResult?,
+      notify: notify == freezed
+          ? _value.notify
+          : notify // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -95,14 +107,16 @@ class __$MyStateCopyWithImpl<$Res> extends _$MyStateCopyWithImpl<$Res>
 /// @nodoc
 
 class _$_MyState implements _MyState {
-  _$_MyState({this.result});
+  _$_MyState({this.result, this.notify});
 
   @override
   final QueryResult? result;
+  @override
+  final String? notify;
 
   @override
   String toString() {
-    return 'MyState(result: $result)';
+    return 'MyState(result: $result, notify: $notify)';
   }
 
   @override
@@ -110,12 +124,16 @@ class _$_MyState implements _MyState {
     return identical(this, other) ||
         (other is _MyState &&
             (identical(other.result, result) ||
-                const DeepCollectionEquality().equals(other.result, result)));
+                const DeepCollectionEquality().equals(other.result, result)) &&
+            (identical(other.notify, notify) ||
+                const DeepCollectionEquality().equals(other.notify, notify)));
   }
 
   @override
   int get hashCode =>
-      runtimeType.hashCode ^ const DeepCollectionEquality().hash(result);
+      runtimeType.hashCode ^
+      const DeepCollectionEquality().hash(result) ^
+      const DeepCollectionEquality().hash(notify);
 
   @JsonKey(ignore: true)
   @override
@@ -124,10 +142,12 @@ class _$_MyState implements _MyState {
 }
 
 abstract class _MyState implements MyState {
-  factory _MyState({QueryResult? result}) = _$_MyState;
+  factory _MyState({QueryResult? result, String? notify}) = _$_MyState;
 
   @override
   QueryResult? get result => throw _privateConstructorUsedError;
+  @override
+  String? get notify => throw _privateConstructorUsedError;
   @override
   @JsonKey(ignore: true)
   _$MyStateCopyWith<_MyState> get copyWith =>

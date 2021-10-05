@@ -5,5 +5,5 @@ part 'my_state.freezed.dart';
 
 @freezed
 class MyState with _$MyState {
-  factory MyState({QueryResult? result}) = _MyState;
+  factory MyState({QueryResult? result, String? notify}) = _MyState;
 }

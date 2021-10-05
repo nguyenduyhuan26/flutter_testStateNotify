@@ -23,7 +23,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     usernameController = TextEditingController(text: "huan123");
-    passwordController = TextEditingController(text: "123");
+    passwordController = TextEditingController(text: "123456");
+
     super.initState();
   }
 
@@ -40,23 +41,41 @@ class _LoginPageState extends State<LoginPage> {
       create: (context) => TestNotifier(),
       builder: (context, snapshot) {
         //final state = context.watch<LoginPageState>();
-        final stateNotifier = context.read<TestNotifier>();
 
-        return Scaffold(
-            backgroundColor: Colors.blue.shade600,
-            body: Column(
-              children: [
-                label(),
-                nameInput(),
-                passInput(),
-                forgotText(),
-                checkbox(),
-                queryView(context),
-                orText(),
-                icon(),
-                signUpText()
-              ],
-            ));
+        return GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Scaffold(
+              backgroundColor: Colors.blue.shade600,
+              body: SingleChildScrollView(
+                reverse: false,
+                child: SafeArea(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 12),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 20),
+                        label(),
+                        nameInput(),
+                        SizedBox(height: 12),
+                        passInput(),
+                        SizedBox(height: 8),
+                        forgotText(),
+                        checkbox(),
+                        SizedBox(height: 12),
+                        queryView(context),
+                        SizedBox(height: 8),
+                        orText(),
+                        icon(),
+                        SizedBox(height: 70),
+                        signUpText()
+                      ],
+                    ),
+                  ),
+                ),
+              )),
+        );
       },
     );
   }
@@ -98,43 +117,39 @@ class _LoginPageState extends State<LoginPage> {
             color: Colors.white,
           ));
         }
-        final opts = FetchMoreOptions(
-          variables: {
-            'name': usernameController.text,
-            'rocket': passwordController.text
-          },
-          updateQuery: (previousResultData, fetchMoreResultData) {
-            //  print('previous: ${previousResultData.toString()}');
-            // print('now: ${fetchMoreResultData.toString()}');
-            return fetchMoreResultData;
-          },
-        );
-        final length = result.data!['users'].length;
-        context.read<TestNotifier>().addState(result);
-        //  print(context.read<TestNotifier>().notification());
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //     content: Text(context.read<TestNotifier>().),
-        //   ),
-        // );
+
+        context.read<TestNotifier>().addValue(result);
+        final noti = context.read<TestNotifier>().notify;
         return Column(
           children: [
             btnLogin(
                 text: "Login",
                 onPressed: () {
-                  print(usernameController.text);
-                  fetchMore!(opts);
-                  setState(() {});
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(context.read<TestNotifier>().notify),
-                    ),
+                  print("object");
+                  final opts = FetchMoreOptions(
+                    variables: {
+                      'name': usernameController.text,
+                      'rocket': passwordController.text
+                    },
+                    updateQuery: (previousResultData, fetchMoreResultData) {
+                      return fetchMoreResultData;
+                    },
                   );
+
+                  fetchMore!(opts);
+                  FocusScope.of(context).unfocus();
+                  setState(() {});
                 }),
-            Text(
-              length.toString(),
-              style: TextStyle(fontSize: 20),
-            ),
+            context.read<TestNotifier>().notify != ""
+                ? Column(
+                    children: [
+                      SizedBox(
+                        height: 12,
+                      ),
+                      baseText(text: noti, color: Colors.black, sizeText: 24),
+                    ],
+                  )
+                : Container()
           ],
         );
       },
@@ -142,38 +157,30 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget checkbox() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
-      child: Row(
-        children: [
-          Theme(
-            data: Theme.of(context).copyWith(
-              unselectedWidgetColor: Colors.white,
-            ),
-            child: Checkbox(
-              checkColor: Colors.black,
-              activeColor: Colors.white,
-              hoverColor: Colors.white,
-              value: false,
-              onChanged: (newValue) {
-                //  checkedValue = newValue;
-              },
-            ),
+    return Row(
+      children: [
+        Theme(
+          data: Theme.of(context).copyWith(
+            unselectedWidgetColor: Colors.white,
           ),
-          baseText(text: "Remember me", sizeText: 20)
-        ],
-      ),
+          child: Checkbox(
+            checkColor: Colors.black,
+            activeColor: Colors.white,
+            hoverColor: Colors.white,
+            value: false,
+            onChanged: (newValue) {},
+          ),
+        ),
+        baseText(text: "Remember me", sizeText: 20)
+      ],
     );
   }
 
   Widget label() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: baseText(
-        text: "Sign In",
-        sizeText: 28,
-        fontWeight: FontWeight.bold,
-      ),
+    return baseText(
+      text: "Sign In",
+      sizeText: 28,
+      fontWeight: FontWeight.bold,
     );
   }
 
@@ -192,73 +199,61 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget btnLogin({required String text, void Function()? onPressed}) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
-      child: MaterialButton(
-        minWidth: MediaQuery.of(context).size.width,
-        onPressed: onPressed,
-        shape: const StadiumBorder(),
-        color: Colors.white,
-        splashColor: Colors.blue[900],
-        disabledColor: Colors.grey,
-        disabledTextColor: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(14.0),
-          child: baseText(
-            text: text,
-            fontWeight: FontWeight.bold,
-            sizeText: 28,
-            color: Colors.lightBlue,
-          ),
+    return MaterialButton(
+      minWidth: MediaQuery.of(context).size.width,
+      onPressed: onPressed,
+      shape: const StadiumBorder(),
+      color: Colors.white,
+      splashColor: Colors.blue[900],
+      disabledColor: Colors.grey,
+      disabledTextColor: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(14.0),
+        child: baseText(
+          text: text,
+          fontWeight: FontWeight.bold,
+          sizeText: 28,
+          color: Colors.lightBlue,
         ),
       ),
     );
   }
 
   Widget forgotText() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 12, 18, 0),
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: baseText(
-          text: "Forgot Password?",
-          sizeText: 18,
-        ),
+    return Align(
+      alignment: Alignment.centerRight,
+      child: baseText(
+        text: "Forgot Password?",
+        sizeText: 18,
       ),
     );
   }
 
   Widget orText() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: baseText(
-              text: "- OR - ",
-              sizeText: 20,
-            ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: baseText(
+            text: "- OR - ",
+            sizeText: 20,
           ),
-          baseText(
-            text: "Sign in with",
-            sizeText: 18,
-          ),
-        ],
-      ),
+        ),
+        baseText(
+          text: "Sign in with",
+          sizeText: 18,
+        ),
+      ],
     );
   }
 
   Widget icon() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(32, 0, 32, 26),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          baseIcon(assetImage: "assets/facebook.png"),
-          baseIcon(assetImage: "assets/google.png"),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        baseIcon(assetImage: "assets/facebook.png"),
+        baseIcon(assetImage: "assets/google.png"),
+      ],
     );
   }
 
@@ -327,41 +322,38 @@ class _LoginPageState extends State<LoginPage> {
     bool isShowText = false,
     // String Function(String)? validator,
   }) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: baseText(text: labelText, sizeText: 18),
-            ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: baseText(text: labelText, sizeText: 18),
           ),
-          TextFormField(
-            controller: controller,
-            obscureText: isShowText,
-            // validator: validator,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              filled: true,
-              fillColor: Colors.blue.shade300,
-              prefixIcon: InkWell(
-                // onTap: onTap,
+        ),
+        TextFormField(
+          controller: controller,
+          obscureText: isShowText,
+          // validator: validator,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            filled: true,
+            fillColor: Colors.blue.shade300,
+            prefixIcon: InkWell(
+              // onTap: onTap,
 
-                child: icon,
-              ),
-              hintText: "$text",
-              hintStyle: TextStyle(
-                fontWeight: FontWeight.w300,
-                color: Colors.white,
-              ),
+              child: icon,
+            ),
+            hintText: "$text",
+            hintStyle: TextStyle(
+              fontWeight: FontWeight.w300,
+              color: Colors.white,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

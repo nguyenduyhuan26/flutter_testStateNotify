@@ -5,11 +5,17 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 class TestNotifier extends StateNotifier<MyState> with LocatorMixin {
   TestNotifier() : super(MyState());
   String notify = "";
-  void addState(QueryResult queryResult) {
+  bool isStart = false;
+
+  void addValue(QueryResult queryResult) {
     state = MyState().copyWith(result: queryResult);
-    //print(state.result!.data!['users'].length.toString());
-    setNotification();
-    print(notify);
+    print("abc");
+    // print(state.result!.data!['users'].length.toString());
+    if (isStart) {
+      setNotification();
+      state = MyState().copyWith(notify: notify);
+    }
+    isStart = true;
   }
 
   void setNotification() {
